@@ -59,6 +59,32 @@
             overflow-x:auto;
         }
         .hide {display:none !important;}
+
+        /* 投票悬浮小框 右下角 */
+        .vote-box{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            background:#fff;
+            padding:12px;
+            border-radius:8px;
+            box-shadow:0 2px 10px #00000022;
+            width:220px;
+            font-size:13px;
+        }
+        .vote-box h4{
+            margin:0 0 8px 0;
+            font-size:14px;
+        }
+        .vote-btn{
+            width:100%;
+            margin:4px 0;
+            padding:6px;
+            font-size:13px;
+        }
+        .vote-text{
+            margin-top:6px;
+        }
     </style>
 </head>
 <body>
@@ -90,12 +116,46 @@
         <span class="toggle-text">查表</span>
     </div>
 
+    <!-- 投票悬浮框 -->
+    <div class="vote-box">
+        <h4>你更支持"float main()"还是"long main()"</h4>
+        <button class="vote-btn" onclick="vote('float')">float main()</button>
+        <button class="vote-btn" onclick="vote('long')">long main()</button>
+        <div class="vote-text">目前：<span id="vFloat">0</span> vs <span id="vLong">0</span></div>
+    </div>
+
 <script>
 const history = [];
 const historyEl = document.getElementById('historyBox');
 const queryPanel = document.getElementById('queryPanel');
 const tablePanel = document.getElementById('tablePanel');
 const toggle = document.getElementById('mainToggle');
+
+// 投票计数
+const keyA = "ascii_page_float_main";
+const keyB = "ascii_page_long_main";
+const api = "https://api.countapi.xyz";
+let lock = false;
+
+async function refreshVote(){
+    let r1 = await fetch(`${api}/get/${keyA}`);
+    let d1 = await r1.json();
+    let r2 = await fetch(`${api}/get/${keyB}`);
+    let d2 = await r2.json();
+    document.getElementById("vFloat").innerText = d1.value;
+    document.getElementById("vLong").innerText = d2.value;
+}
+async function vote(type){
+    if(lock) return;
+    lock=true;
+    if(type==='float'){
+        await fetch(`${api}/hit/${keyA}`);
+    }else{
+        await fetch(`${api}/hit/${keyB}`);
+    }
+    await refreshVote();
+    setTimeout(()=>lock=false,800);
+}
 
 // 生成完整ASCII表文本
 function buildAsciiTableText(){
@@ -239,6 +299,9 @@ toggle.onchange = function(){
         tablePanel.classList.add('hide');
     }
 }
+
+// 页面加载读取投票数
+refreshVote();
 </script>
 </body>
 </html>

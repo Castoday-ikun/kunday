@@ -17,7 +17,6 @@
         #historyBox {margin-top:10px;max-height:320px;overflow-y:auto;}
         .char-val {color:#22aa22;font-weight:bold;}
 
-        /* 底部切换开关 */
         .mode-toggle-wrap {
             position:fixed;
             bottom:20px;
@@ -48,7 +47,6 @@
         input:checked + .slider {background:#2563eb;}
         input:checked + .slider:before {transform:translateX(24px);}
 
-        /* ASCII查表面板 */
         #tablePanel {
             white-space:pre-wrap;
             font-family:Consolas,monospace;
@@ -60,7 +58,7 @@
         }
         .hide {display:none !important;}
 
-        /* 投票悬浮小框 右下角，匹配截图样式 */
+        /* 重点：加高z-index，防止被底部开关盖住 */
         .vote-box{
             position:fixed;
             bottom:20px;
@@ -70,6 +68,7 @@
             border-radius:16px;
             box-shadow:0 4px 16px #00000018;
             width:320px;
+            z-index:9999;
         }
         .vote-box h4{
             margin:0 0 16px 0;
@@ -87,6 +86,8 @@
             border:none;
             color:white;
             cursor:pointer;
+            position:relative;
+            z-index:10000;
         }
         .vote-btn:hover{
             background:#1d4ed8;
@@ -137,7 +138,6 @@
         <span class="toggle-text">查表</span>
     </div>
 
-    <!-- 投票悬浮框 -->
     <div class="vote-box">
         <h4>你更支持"float main()"还是"long main()"</h4>
         <button class="vote-btn" onclick="vote('float')">float main()</button>
@@ -156,19 +156,16 @@ const toggle = document.getElementById('mainToggle');
 
 let vFloat = 0;
 let vLong = 0;
-let lock = false;
 
 function refreshVote(){
     document.getElementById("vFloat").innerText = vFloat;
     document.getElementById("vLong").innerText = vLong;
 }
+// 删掉lock防抖，直接点击就能计数
 function vote(type){
-    if(lock) return;
-    lock=true;
     if(type === 'float') vFloat++;
     else vLong++;
     refreshVote();
-    setTimeout(()=>lock=false,800);
 }
 
 function genCode(){
@@ -241,6 +238,7 @@ function genCode(){
             border-radius:16px;
             box-shadow:0 4px 16px #00000018;
             width:320px;
+            z-index:9999;
         }
         .vote-box h4{
             margin:0 0 16px 0;
@@ -258,6 +256,8 @@ function genCode(){
             border:none;
             color:white;
             cursor:pointer;
+            position:relative;
+            z-index:10000;
         }
         .vote-btn:hover{
             background:#1d4ed8;
@@ -326,19 +326,15 @@ const toggle = document.getElementById('mainToggle');
 
 let vFloat = ${vFloat};
 let vLong = ${vLong};
-let lock = false;
 
 function refreshVote(){
     document.getElementById("vFloat").innerText = vFloat;
     document.getElementById("vLong").innerText = vLong;
 }
 function vote(type){
-    if(lock) return;
-    lock=true;
     if(type === 'float') vFloat++;
     else vLong++;
     refreshVote();
-    setTimeout(()=>lock=false,800);
 }
 function genCode(){
     const tpl = \`\${document.getElementById('codeOut').value}\`;
@@ -350,15 +346,15 @@ function buildAsciiTableText(){
     for(let c=0;c<=127;c++){
         names[c] = getDisplayChar(c);
     }
-    let s = "==== ASCII 0~127 完整表 ====\\n";
-    s += "十进制 >>> 名称/字符\\n";
-    s += "-----------------------------\\n";
+    let s = "==== ASCII 0~127 完整表 ====\n";
+    s += "十进制 >>> 名称/字符\n";
+    s += "-----------------------------\n";
     for(let i=0;i<=127;i++){
         let ch = names[i];
         if(ch==' ')
-            s += \`\${i.toString().padStart(6)} | space\\n\`;
+            s += \`\${i.toString().padStart(6)} | space\n\`;
         else
-            s += \`\${i.toString().padStart(6)} | \${ch}\\n\`;
+            s += \`\${i.toString().padStart(6)} | \${ch}\n\`;
     }
     return s;
 }

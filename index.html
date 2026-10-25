@@ -59,6 +59,20 @@
             overflow-x:auto;
         }
         .hide {display:none !important;}
+
+        /* 右侧速查框 */
+        .quick-box{
+            position:fixed;
+            top:24px;
+            right:24px;
+            background:#fff;
+            padding:18px;
+            border-radius:10px;
+            box-shadow:0 2px 8px #00000014;
+            font-family:Consolas,monospace;
+            font-size:17px;
+            line-height:1.6;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +94,18 @@
     </div>
 
     <div id="tablePanel" class="box hide"></div>
+
+    <!-- 右侧速查框 -->
+    <div class="quick-box">
+48 >> <span class="char-val">0</span><br>
+57 >> <span class="char-val">9</span><br>
+<br>
+65 >> <span class="char-val">A</span><br>
+90 >> <span class="char-val">Z</span><br>
+<br>
+97 >> <span class="char-val">a</span><br>
+122 >> <span class="char-val">z</span>
+    </div>
 
     <div class="mode-toggle-wrap">
         <span class="toggle-text">查询</span>

@@ -142,7 +142,7 @@
         <h4>你更支持"float main()"还是"long main()"</h4>
         <button class="vote-btn" onclick="vote('float')">float main()</button>
         <button class="vote-btn" onclick="vote('long')">long main()</button>
-        <div class="vote-text">目前：<span id="vFloat">0</span> vs <span id="vLong">0</span></div>
+        <div class="vote-text">本次<span id="vFloat">0</span> vs <span id="vLong">0</span></div>
         <button class="save-code-btn" onclick="genCode()">生成带当前票数的HTML</button>
         <textarea id="codeOut" readonly></textarea>
     </div>
@@ -154,7 +154,6 @@ const queryPanel = document.getElementById('queryPanel');
 const tablePanel = document.getElementById('tablePanel');
 const toggle = document.getElementById('mainToggle');
 
-// 票数写在这里，生成代码时会替换这两个数字
 let vFloat = 0;
 let vLong = 0;
 let lock = false;
@@ -172,7 +171,6 @@ function vote(type){
     setTimeout(()=>lock=false,800);
 }
 
-// 生成新源码，票数硬编码进去
 function genCode(){
     const tpl = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -314,7 +312,7 @@ function genCode(){
         <h4>你更支持"float main()"还是"long main()"</h4>
         <button class="vote-btn" onclick="vote('float')">float main()</button>
         <button class="vote-btn" onclick="vote('long')">long main()</button>
-        <div class="vote-text">目前：<span id="vFloat">${vFloat}</span> vs <span id="vLong">${vLong}</span></div>
+        <div class="vote-text">本次<span id="vFloat">${vFloat}</span> vs <span id="vLong">${vLong}</span></div>
         <button class="save-code-btn" onclick="genCode()">生成带当前票数的HTML</button>
         <textarea id="codeOut" readonly></textarea>
     </div>
@@ -494,7 +492,6 @@ refreshVote();
     document.getElementById('codeOut').value = tpl;
 }
 
-// 生成完整ASCII表文本
 function buildAsciiTableText(){
     const names = [];
     for(let c=0;c<=127;c++){

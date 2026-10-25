@@ -58,7 +58,6 @@
         }
         .hide {display:none !important;}
 
-        /* 重点：加高z-index，防止被底部开关盖住 */
         .vote-box{
             position:fixed;
             bottom:20px;
@@ -161,7 +160,6 @@ function refreshVote(){
     document.getElementById("vFloat").innerText = vFloat;
     document.getElementById("vLong").innerText = vLong;
 }
-// 删掉lock防抖，直接点击就能计数
 function vote(type){
     if(type === 'float') vFloat++;
     else vLong++;
@@ -337,7 +335,6 @@ function vote(type){
     refreshVote();
 }
 function genCode(){
-    const tpl = \`\${document.getElementById('codeOut').value}\`;
     alert('已生成');
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASCII 查询工具 (made by kunday)</title>
+    <title>ASCII 查询工具</title>
     <style>
         * {box-sizing: border-box;font-family: system-ui, sans-serif;}
         body {padding:24px;padding-bottom:80px;margin:0 auto;max-width:700px;background:#f5f7fa;}
@@ -17,6 +17,7 @@
         #historyBox {margin-top:10px;max-height:320px;overflow-y:auto;}
         .char-val {color:#22aa22;font-weight:bold;}
 
+        /* 底部切换开关 */
         .mode-toggle-wrap {
             position:fixed;
             bottom:20px;
@@ -47,6 +48,7 @@
         input:checked + .slider {background:#2563eb;}
         input:checked + .slider:before {transform:translateX(24px);}
 
+        /* ASCII查表面板 */
         #tablePanel {
             white-space:pre-wrap;
             font-family:Consolas,monospace;
@@ -57,55 +59,6 @@
             overflow-x:auto;
         }
         .hide {display:none !important;}
-
-        .vote-box{
-            position:fixed;
-            bottom:20px;
-            right:20px;
-            background:#fff;
-            padding:20px;
-            border-radius:16px;
-            box-shadow:0 4px 16px #00000018;
-            width:320px;
-            z-index:9999;
-        }
-        .vote-box h4{
-            margin:0 0 16px 0;
-            font-size:24px;
-            font-weight:600;
-            line-height:1.3;
-        }
-        .vote-btn{
-            width:100%;
-            margin:8px 0;
-            padding:14px;
-            font-size:26px;
-            background:#2563eb;
-            border-radius:12px;
-            border:none;
-            color:white;
-            cursor:pointer;
-            position:relative;
-            z-index:10000;
-        }
-        .vote-btn:hover{
-            background:#1d4ed8;
-        }
-        .vote-text{
-            margin-top:16px;
-            font-size:24px;
-        }
-        .save-code-btn{
-            margin-top:12px;
-            width:100%;
-            background:#22c55e;
-        }
-        #codeOut{
-            margin-top:10px;
-            width:100%;
-            height:140px;
-            font-size:10px;
-        }
     </style>
 </head>
 <body>
@@ -137,15 +90,6 @@
         <span class="toggle-text">查表</span>
     </div>
 
-    <div class="vote-box">
-        <h4>你更支持"float main()"还是"long main()"</h4>
-        <button class="vote-btn" onclick="vote('float')">float main()</button>
-        <button class="vote-btn" onclick="vote('long')">long main()</button>
-        <div class="vote-text">本次<span id="vFloat">0</span> vs <span id="vLong">0</span></div>
-        <button class="save-code-btn" onclick="genCode()">生成带当前票数的HTML</button>
-        <textarea id="codeOut" readonly></textarea>
-    </div>
-
 <script>
 const history = [];
 const historyEl = document.getElementById('historyBox');
@@ -153,338 +97,7 @@ const queryPanel = document.getElementById('queryPanel');
 const tablePanel = document.getElementById('tablePanel');
 const toggle = document.getElementById('mainToggle');
 
-let vFloat = 0;
-let vLong = 0;
-
-function refreshVote(){
-    document.getElementById("vFloat").innerText = vFloat;
-    document.getElementById("vLong").innerText = vLong;
-}
-function vote(type){
-    if(type === 'float') vFloat++;
-    else vLong++;
-    refreshVote();
-}
-
-function genCode(){
-    const tpl = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASCII 查询工具 (made by kunday)</title>
-    <style>
-        * {box-sizing: border-box;font-family: system-ui, sans-serif;}
-        body {padding:24px;padding-bottom:80px;margin:0 auto;max-width:700px;background:#f5f7fa;}
-        .box {background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px #00000014;margin-bottom:16px;}
-        label {display:block;margin-bottom:6px;font-weight:500;}
-        select,input {width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;font-size:16px;margin-bottom:14px;}
-        button {padding:9px 16px;border:none;border-radius:6px;background:#2563eb;color:#fff;font-size:15px;cursor:pointer;}
-        button:hover {background:#1d4ed8;}
-        .del-btn {background:#ef4444;padding:4px 8px;font-size:12px;margin-left:8px;}
-        .history-item {padding:6px 0;border-bottom:1px solid #eee;display:flex;align-items:center;}
-        #historyBox {margin-top:10px;max-height:320px;overflow-y:auto;}
-        .char-val {color:#22aa22;font-weight:bold;}
-
-        .mode-toggle-wrap {
-            position:fixed;
-            bottom:20px;
-            left:50%;
-            transform:translateX(-50%);
-            background:#fff;
-            padding:10px 16px;
-            border-radius:999px;
-            box-shadow:0 2px 10px #00000022;
-            display:flex;
-            align-items:center;
-            gap:10px;
-        }
-        .toggle-text {font-size:15px;}
-        .switch {
-            position:relative;
-            width:52px;height:28px;
-        }
-        .switch input {opacity:0;width:0;height:0;}
-        .slider {
-            position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;
-            background-color:#ccc;transition:.3s;border-radius:28px;
-        }
-        .slider:before {
-            position:absolute;content:"";height:22px;width:22px;left:3px;bottom:3px;
-            background:white;transition:.3s;border-radius:50%;
-        }
-        input:checked + .slider {background:#2563eb;}
-        input:checked + .slider:before {transform:translateX(24px);}
-
-        #tablePanel {
-            white-space:pre-wrap;
-            font-family:Consolas,monospace;
-            line-height:1.4;
-            padding:12px;
-            background:#fff;
-            border-radius:8px;
-            overflow-x:auto;
-        }
-        .hide {display:none !important;}
-
-        .vote-box{
-            position:fixed;
-            bottom:20px;
-            right:20px;
-            background:#fff;
-            padding:20px;
-            border-radius:16px;
-            box-shadow:0 4px 16px #00000018;
-            width:320px;
-            z-index:9999;
-        }
-        .vote-box h4{
-            margin:0 0 16px 0;
-            font-size:24px;
-            font-weight:600;
-            line-height:1.3;
-        }
-        .vote-btn{
-            width:100%;
-            margin:8px 0;
-            padding:14px;
-            font-size:26px;
-            background:#2563eb;
-            border-radius:12px;
-            border:none;
-            color:white;
-            cursor:pointer;
-            position:relative;
-            z-index:10000;
-        }
-        .vote-btn:hover{
-            background:#1d4ed8;
-        }
-        .vote-text{
-            margin-top:16px;
-            font-size:24px;
-        }
-        .save-code-btn{
-            margin-top:12px;
-            width:100%;
-            background:#22c55e;
-        }
-        #codeOut{
-            margin-top:10px;
-            width:100%;
-            height:140px;
-            font-size:10px;
-        }
-    </style>
-</head>
-<body>
-    <div id="queryPanel">
-        <div class="box">
-            <label>转换模式</label>
-            <select id="modeSel">
-                <option value="char2ascii" selected>字符转ASCII码</option>
-                <option value="ascii2char">ASCII码转字符</option>
-            </select>
-            <label>输入内容</label>
-            <input type="text" id="inputVal" placeholder="">
-            <button onclick="doConvert()">执行转换</button>
-        </div>
-        <div class="box">
-            <label>历史查询</label>
-            <div id="historyBox"></div>
-        </div>
-    </div>
-
-    <div id="tablePanel" class="box hide"></div>
-
-    <div class="mode-toggle-wrap">
-        <span class="toggle-text">查询</span>
-        <label class="switch">
-            <input type="checkbox" id="mainToggle">
-            <span class="slider"></span>
-        </label>
-        <span class="toggle-text">查表</span>
-    </div>
-
-    <div class="vote-box">
-        <h4>你更支持"float main()"还是"long main()"</h4>
-        <button class="vote-btn" onclick="vote('float')">float main()</button>
-        <button class="vote-btn" onclick="vote('long')">long main()</button>
-        <div class="vote-text">本次<span id="vFloat">${vFloat}</span> vs <span id="vLong">${vLong}</span></div>
-        <button class="save-code-btn" onclick="genCode()">生成带当前票数的HTML</button>
-        <textarea id="codeOut" readonly></textarea>
-    </div>
-
-<script>
-const history = [];
-const historyEl = document.getElementById('historyBox');
-const queryPanel = document.getElementById('queryPanel');
-const tablePanel = document.getElementById('tablePanel');
-const toggle = document.getElementById('mainToggle');
-
-let vFloat = ${vFloat};
-let vLong = ${vLong};
-
-function refreshVote(){
-    document.getElementById("vFloat").innerText = vFloat;
-    document.getElementById("vLong").innerText = vLong;
-}
-function vote(type){
-    if(type === 'float') vFloat++;
-    else vLong++;
-    refreshVote();
-}
-function genCode(){
-    alert('已生成');
-}
-
-function buildAsciiTableText(){
-    const names = [];
-    for(let c=0;c<=127;c++){
-        names[c] = getDisplayChar(c);
-    }
-    let s = "==== ASCII 0~127 完整表 ====\n";
-    s += "十进制 >>> 名称/字符\n";
-    s += "-----------------------------\n";
-    for(let i=0;i<=127;i++){
-        let ch = names[i];
-        if(ch==' ')
-            s += \`\${i.toString().padStart(6)} | space\n\`;
-        else
-            s += \`\${i.toString().padStart(6)} | \${ch}\n\`;
-    }
-    return s;
-}
-
-function getDisplayChar(code){
-    if(code === -1) return 'EOF';
-    if(code === 0) return 'NUL';
-    if(code === 1) return 'SOH';
-    if(code === 2) return 'STX';
-    if(code === 3) return 'ETX';
-    if(code === 4) return 'EOT';
-    if(code === 5) return 'ENQ';
-    if(code === 6) return 'ACK';
-    if(code === 7) return 'BEL';
-    if(code === 8) return 'BS';
-    if(code === 9) return 'TAB';
-    if(code === 10) return 'LF';
-    if(code === 11) return 'VT';
-    if(code === 12) return 'FF';
-    if(code === 13) return 'CR';
-    if(code === 14) return 'SO';
-    if(code === 15) return 'SI';
-    if(code === 16) return 'DLE';
-    if(code === 17) return 'DC1';
-    if(code === 18) return 'DC2';
-    if(code === 19) return 'DC3';
-    if(code === 20) return 'DC4';
-    if(code === 21) return 'NAK';
-    if(code === 22) return 'SYN';
-    if(code === 23) return 'ETB';
-    if(code === 24) return 'CAN';
-    if(code === 25) return 'EM';
-    if(code === 26) return 'SUB';
-    if(code === 27) return 'ESC';
-    if(code === 28) return 'FS';
-    if(code === 29) return 'GS';
-    if(code === 30) return 'RS';
-    if(code === 31) return 'US';
-    if(code === 32) return 'space';
-    if(code === 127) return 'DEL';
-    return String.fromCharCode(code);
-}
-
-function renderHistory(){
-    historyEl.innerHTML = '';
-    history.forEach((item,idx)=>{
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        const disp = getDisplayChar(item.code);
-        const safeDisp = disp.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
-        div.innerHTML = \`\${item.code} >> '<span class="char-val">\${safeDisp}</span>'\`;
-        const delBtn = document.createElement('button');
-        delBtn.className = 'del-btn';
-        delBtn.textContent = '删除';
-        delBtn.onclick = ()=>{
-            history.splice(idx,1);
-            renderHistory();
-        }
-        div.appendChild(delBtn);
-        historyEl.appendChild(div);
-    })
-}
-
-function parseEscape(s){
-    const t = s.trim();
-    if(t === 'EOF') return {code:-1};
-    if(t === 'NUL') return {code:0};
-    if(t === 'DEL') return {code:127};
-    if(t === ' '||t=='space') return {code:32};
-
-    let res = '';
-    for(let i=0;i<s.length;i++){
-        if(s[i] === '\\\\' && i+1 < s.length){
-            let c = s[i+1];
-            if(c === 'r'){res += '\\r';i++;continue;}
-            if(c === 'n'){res += '\\n';i++;continue;}
-            if(c === 't'){res += '\\t';i++;continue;}
-            if(c === 'b'){res += '\\b';i++;continue;}
-            if(c === 'f'){res += '\\f';i++;continue;}
-            if(c === 'v'){res += '\\v';i++;continue;}
-            if(c === '0'){res += '\\0';i++;continue;}
-            if(c === 'x' && i+3 <= s.length){
-                let hex = s.substr(i+2,2);
-                if(/[0-9a-fA-F]{2}/.test(hex)){
-                    res += String.fromCharCode(parseInt(hex,16));
-                    i += 3;
-                    continue;
-                }
-            }
-        }
-        res += s[i];
-    }
-    return {ch:res[0]};
-}
-
-function doConvert(){
-    const mode = document.getElementById('modeSel').value;
-    const raw = document.getElementById('inputVal').value;
-    let code,ch;
-    if(mode === 'char2ascii'){
-        if(raw.length <1) return;
-        const parsed = parseEscape(raw);
-        if(parsed.code !== undefined){
-            code = parsed.code;
-        }else{
-            ch = parsed.ch;
-            code = ch.charCodeAt(0);
-        }
-    }else{
-        code = Number(raw.trim());
-        if(isNaN(code) || code < -1 || code > 127) return alert("请输入-1(EOF) 或 0~127");
-    }
-    history.unshift({code});
-    renderHistory();
-}
-
-toggle.onchange = function(){
-    if(this.checked){
-        queryPanel.classList.add('hide');
-        tablePanel.classList.remove('hide');
-        tablePanel.innerText = buildAsciiTableText();
-    }else{
-        queryPanel.classList.remove('hide');
-        tablePanel.classList.add('hide');
-    }
-}
-refreshVote();
-</script>
-</body>
-</html>`;
-    document.getElementById('codeOut').value = tpl;
-}
-
+// 生成完整ASCII表文本
 function buildAsciiTableText(){
     const names = [];
     for(let c=0;c<=127;c++){
@@ -615,6 +228,7 @@ function doConvert(){
     renderHistory();
 }
 
+// 切换滑块事件
 toggle.onchange = function(){
     if(this.checked){
         queryPanel.classList.add('hide');
@@ -625,7 +239,6 @@ toggle.onchange = function(){
         tablePanel.classList.add('hide');
     }
 }
-refreshVote();
 </script>
 </body>
 </html>
